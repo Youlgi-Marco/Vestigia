@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f7f5f0">
+<meta name="description" content="Vestigia – Your Timeless Tracker">
+<title>Vestigia</title>
+<link rel="manifest" href="#" id="manifest-link">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --bg2: #efeae0;
+    --surface: #ffffff;
+    --surface2: #f0ece3;
+    --text: #1a1a2e;
+    --text2: #4a4a6a;
+    --text3: #8888aa;
+    --grad1: #28279f;
+    --grad2: #715fc9;
+    --grad3: #b469e0;
+    --grad: linear-gradient(135deg, #28279f, #715fc9, #b469e0);
+    --grad-soft: linear-gradient(135deg, rgba(40,39,159,0.12), rgba(180,105,224,0.12));
+    --shadow: 0 4px 24px rgba(40,39,159,0.08);
+    --shadow-sm: 0 2px 12px rgba(40,39,159,0.06);
+    --radius: 20px;
+    --radius-sm: 12px;
+    --transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── LOADING SCREEN ─── */
+  #loading-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 24px;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #loading-screen.hide { opacity: 0; visibility: hidden; }
+
+  .loading-logo {
+    width: 180px;
+    animation: logoPulse 2s ease-in-out infinite;
+  }
+  @keyframes logoPulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.85; }
+  }
+
+  .loading-bar-wrap {
+    width: 160px; height: 3px;
+    background: var(--bg2); border-radius: 99px; overflow: hidden;
+  }
+  .loading-bar {
+    height: 100%; border-radius: 99px;
+    background: var(--grad);
+    animation: loadBar 2s ease-in-out forwards;
+  }
+  @keyframes loadBar { 0%{width:0%} 100%{width:100%} }
+
+  .loading-tagline {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  /* ─── PAGES ─── */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ─── AUTH PAGES ─── */
+  .auth-wrap {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--bg);
+  }
+  @media(max-width:768px) { .auth-wrap { grid-template-columns: 1fr; } }
+
+  .auth-left {
+    background: var(--grad);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 48px;
+    gap: 20px;
+  }
+  @media(max-width:768px) { .auth-left { padding: 40px 24px; min-height: 220px; } }
+
+  .auth-left img { width: 160px; filter: brightness(0) invert(1); opacity: 0.95; }
+  .auth-left p { color: rgba(255,255,255,0.85); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+
+  .auth-right {
+    display: flex; align-items: center; justify-content: center;
+    padding: 48px 40px;
+  }
+  @media(max-width:768px) { .auth-right { padding: 32px 24px; } }
+
+  .auth-card { width: 100%; max-width: 400px; }
+
+  .auth-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; margin-bottom: 8px;
+    color: var(--text);
+  }
+  .auth-subtitle { color: var(--text3); font-size: 14px; margin-bottom: 32px; }
+
+  /* ─── FORM CONTROLS ─── */
+  .form-label { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+  .form-control {
+    background: var(--surface);
+    border: 1.5px solid var(--bg2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--text);
+    transition: var(--transition);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .form-control:focus {
+    outline: none; box-shadow: 0 0 0 3px rgba(113,95,201,0.15);
+    border-color: var(--grad2);
+    background: var(--surface);
+  }
+  .form-control::placeholder { color: var(--text3); }
+
+  /* ─── BUTTONS ─── */
+  .btn-grad {
+    background: var(--grad);
+    border: none; border-radius: var(--radius-sm);
+    padding: 13px 24px;
+    color: white; font-weight: 600; font-size: 14px;
+    cursor: pointer; width: 100%;
+    transition: var(--transition);
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .btn-grad:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(113,95,201,0.35); }
+  .btn-grad:active { transform: translateY(0); }
+
+  .btn-outline-grad {
+    background: transparent;
+    border: 1.5px solid var(--grad2);
+    border-radius: var(--radius-sm);
+    padding: 11px 24px;
+    color: var(--grad2); font-weight: 500; font-size: 14px;
+    cursor: pointer; transition: var(--transition);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-outline-grad:hover { background: var(--grad-soft); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent; border: none;
+    color: var(--text3); font-size: 13px;
+    cursor: pointer; padding: 4px 0;
+    transition: var(--transition);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-ghost:hover { color: var(--grad2); }
+
+  .btn-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: none; background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: var(--transition);
+    color: var(--text2); font-size: 18px;
+  }
+  .btn-icon:hover { background: var(--bg2); color: var(--grad2); }
+
+  /* ─── BADGE PRO ─── */
+  .badge-pro {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--grad); color: white;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 99px; letter-spacing: 1px;
+  }
+  .badge-free {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--bg2); color: var(--text3);
+    font-size: 10px; font-weight: 600;
+    padding: 3px 8px; border-radius: 99px; letter-spacing: 1px;
+  }
+
+  /* ─── DIVIDER ─── */
+  .auth-divider {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--text3); font-size: 12px; margin: 20px 0;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--bg2);
+  }
+
+  /* ─── TOAST ─── */
+  .toast-wrap {
+    position: fixed; top: 20px; right: 20px; z-index: 10000;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .toast-item {
+    background: var(--surface); border-radius: var(--radius-sm);
+    padding: 14px 18px; min-width: 260px;
+    box-shadow: var(--shadow);
+    font-size: 14px; color: var(--text);
+    border-left: 3px solid var(--grad2);
+    animation: toastIn 0.3s ease;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .toast-item.success { border-color: #4caf82; }
+  .toast-item.error { border-color: #e05a6c; }
+  @keyframes toastIn {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  /* ─── MAIN APP LAYOUT ─── */
+  #page-app {
+    display: none;
+    min-height: 100vh;
+    background: var(--bg);
+  }
+  #page-app.active { display: flex; flex-direction: column; }
+
+  /* ─── TOP NAV ─── */
+  .top-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--bg2);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+  .top-nav img { height: 36px; }
+
+  .nav-actions { display: flex; align-items: center; gap: 8px; }
+
+  /* ─── BOTTOM NAV ─── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: var(--surface);
+    border-top: 1px solid var(--bg2);
+    display: flex; padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(40,39,159,0.06);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    cursor: pointer; padding: 4px 0;
+    transition: var(--transition);
+    color: var(--text3);
+    border: none; background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav-item.active { color: var(--grad2); }
+  .nav-item i { font-size: 22px; transition: var(--transition); }
+  .nav-item.active i { transform: scale(1.1); }
+  .nav-item span { font-size: 10px; font-weight: 500; letter-spacing: 0.5px; }
+
+  /* ─── MAIN CONTENT ─── */
+  .main-content {
+    flex: 1; padding: 24px 20px 100px;
+    max-width: 680px; margin: 0 auto; width: 100%;
+  }
+
+  /* ─── SECTION TITLES ─── */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; margin-bottom: 16px; color: var(--text);
+  }
+  .section-sub { font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 16px;
+    border: 1px solid rgba(240,236,227,0.8);
+    transition: var(--transition);
+  }
+  .card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+
+  .card-title {
+    font-weight: 600; font-size: 14px;
+    color: var(--text2); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title i { color: var(--grad2); }
+
+  /* ─── MOOD SELECTOR ─── */
+  .mood-grid {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
+  }
+  .mood-btn {
+    flex: 1; min-width: 52px;
+    background: var(--bg);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    padding: 10px 8px;
+    cursor: pointer; transition: var(--transition);
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .mood-btn:hover { background: var(--grad-soft); border-color: var(--grad2); transform: scale(1.05); }
+  .mood-btn.selected {
+    background: var(--grad-soft);
+    border-color: var(--grad2);
+    transform: scale(1.05);
+  }
+  .mood-btn .emoji { font-size: 22px; display: block; }
+  .mood-btn .label { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+  /* ─── TEXTAREA ─── */
+  textarea.form-control { resize: none; min-height: 90px; }
+
+  /* ─── ENERGY BLOCKS ─── */
+  .energy-block {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 10px;
+    border: 1px solid var(--bg2);
+    transition: var(--transition);
+  }
+  .energy-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .energy-label {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 600; font-size: 13px; color: var(--text2);
+  }
+  .energy-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .energy-dot.pagi { background: #f4a836; }
+  .energy-dot.siang { background: var(--grad2); }
+  .energy-dot.malam { background: #28279f; }
+
+  .task-list { list-style: none; padding: 0; }
+  .task-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bg2);
+    font-size: 14px; color: var(--text);
+    transition: var(--transition);
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 6px;
+    border: 2px solid var(--bg2);
+    flex-shrink: 0; cursor: pointer; transition: var(--transition);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .task-check.done {
+    background: var(--grad);
+    border-color: transparent;
+    color: white; font-size: 11px;
+  }
+  .task-text.done { text-decoration: line-through; color: var(--text3); }
+
+  .task-add-row {
+    display: flex; gap: 8px; margin-top: 10px;
+  }
+  .task-add-row .form-control { flex: 1; padding: 10px 14px; font-size: 13px; }
+
+  .btn-add-task {
+    background: var(--grad);
+    border: none; border-radius: var(--radius-sm);
+    width: 38px; height: 38px; flex-shrink: 0;
+    color: white; font-size: 18px;
+    cursor: pointer; transition: var(--transition);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-add-task:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(113,95,201,0.4); }
+
+  /* ─── MOOD JOURNAL ─── */
+  .journal-entry {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--grad2);
+    transition: var(--transition);
+  }
+  .journal-entry:hover { background: var(--grad-soft); }
+  .journal-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .journal-date { font-size: 11px; color: var(--text3); }
+  .journal-mood { font-size: 18px; }
+  .journal-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  .pattern-row {
+    display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .pattern-day {
+    flex: 1; min-width: 36px;
+    background: var(--bg); border-radius: 10px;
+    padding: 10px 4px; text-align: center;
+    border: 1.5px solid var(--bg2);
+  }
+  .pattern-day.has-mood { border-color: var(--grad2); background: var(--grad-soft); }
+  .pattern-day-name { font-size: 9px; color: var(--text3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .pattern-day-emoji { font-size: 18px; display: block; }
+
+  /* ─── KEUANGAN ─── */
+  .finance-summary {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; margin-bottom: 20px;
+  }
+  .finance-card {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    text-align: center;
+    border: 1px solid var(--bg2);
+  }
+  .finance-card.income { border-top: 3px solid #4caf82; }
+  .finance-card.expense { border-top: 3px solid #e05a6c; }
+  .finance-card.balance { border-top: 3px solid var(--grad2); }
+  .finance-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .finance-amount { font-size: 15px; font-weight: 700; color: var(--text); }
+  .finance-amount.income { color: #4caf82; }
+  .finance-amount.expense { color: #e05a6c; }
+
+  .finance-quick {
+    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .quick-cat {
+    background: var(--bg);
+    border: 1.5px solid var(--bg2);
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-size: 12px; cursor: pointer; transition: var(--transition);
+    color: var(--text2); font-family: 'DM Sans', sans-serif;
+  }
+  .quick-cat.selected, .quick-cat:hover { background: var(--grad-soft); border-color: var(--grad2); color: var(--grad2); }
+
+  .tx-list { list-style: none; padding: 0; }
+  .tx-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--bg2);
+    transition: var(--transition);
+  }
+  .tx-item:last-child { border-bottom: none; }
+  .tx-left { display: flex; align-items: center; gap: 12px; }
+  .tx-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .tx-icon.income { background: rgba(76,175,130,0.12); }
+  .tx-icon.expense { background: rgba(224,90,108,0.1); }
+  .tx-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .tx-cat { font-size: 11px; color: var(--text3); }
+  .tx-amount { font-size: 15px; font-weight: 700; }
+  .tx-amount.income { color: #4caf82; }
+  .tx-amount.expense { color: #e05a6c; }
+
+  /* ─── WEEKLY REFLECTION ─── */
+  .reflection-note {
+    background: var(--bg);
+    border: 1px solid var(--bg2);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .reflection-meta {
+    font-size: 11px; color: var(--text3);
+    margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .reflection-text { font-size: 14px; color: var(--text2); line-height: 1.8; }
+
+  .week-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .week-stat {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 14px; border: 1px solid var(--bg2);
+  }
+  .week-stat-val { font-size: 24px; font-weight: 700; background: var(--grad); s: text; -webkit-text-fill-color: transparent; }
+  .week-stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* ─── PROFILE ─── */
+  .profile-avatar {
+    width: 80px; height: 80px;
+    background: var(--grad);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; color: white; font-family: 'DM Serif Display', serif;
+    margin: 0 auto 16px;
+  }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+  .modal-box {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 28px; width: 100%; max-width: 440px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 20px; }
+
+  /* ─── CHECKIN ─── */
+  .checkin-banner {
+    background: var(--grad);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    color: white; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .checkin-banner h3 { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 4px; }
+  .checkin-banner p { font-size: 13px; opacity: 0.85; }
+  .checkin-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    border-radius: var(--radius-sm);
+    color: white; font-size: 13px; font-weight: 600;
+    padding: 10px 18px; cursor: pointer; transition: var(--transition);
+    font-family: 'DM Sans', sans-serif; flex-shrink: 0;
+  }
+  .checkin-btn:hover { background: rgba(255,255,255,0.3); }
+
+  /* ─── GREETING ─── */
+  .greeting { margin-bottom: 20px; }
+  .greeting-time { font-size: 12px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+  .greeting-name { font-family: 'DM Serif Display', serif; font-size: 26px; margin: 2px 0 4px; }
+  .greeting-quote { font-size: 13px; color: var(--text3); font-style: italic; }
+
+  /* ─── PLAN PRO ─── */
+  .plan-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media(max-width:480px) { .plan-cards { grid-template-columns: 1fr; } }
+
+  .plan-card {
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 2px solid var(--bg2);
+    position: relative; transition: var(--transition);
+  }
+  .plan-card.pro {
+    background: var(--grad);
+    border-color: transparent; color: white;
+  }
+  .plan-card:not(.pro) { background: var(--surface); }
+  .plan-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .plan-price { font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 12px; }
+  .plan-price span { font-size: 14px; font-weight: 400; opacity: 0.7; }
+  .plan-feat { font-size: 12px; line-height: 2; opacity: 0.85; }
+  .plan-feat li { list-style: none; padding-left: 16px; position: relative; }
+  .plan-feat li::before { content: '✓'; position: absolute; left: 0; }
+
+  /* ─── FORGOT PASSWORD ─── */
+  .forgot-back {
+    color: var(--text3); font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 24px; transition: var(--transition);
+    background: none; border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .forgot-back:hover { color: var(--grad2); }
+
+  /* ─── MISC ─── */
+  .text-grad { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .pill { display: inline-block; background: var(--grad-soft); color: var(--grad2); border-radius: 99px; padding: 3px 10px; font-size: 11px; font-weight: 600; }
+
+  .empty-state { text-align: center; padding: 32px; color: var(--text3); }
+  .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+  .empty-state p { font-size: 14px; }
+
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .form-select {
+    background: var(--surface);
+    border: 1.5px solid var(--bg2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px; font-size: 14px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    transition: var(--transition);
+  }
+  .form-select:focus { outline: none; border-color: var(--grad2); box-shadow: 0 0 0 3px rgba(113,95,201,0.15); }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+  .toggle-label { font-size: 14px; color: var(--text2); }
+
+  .form-check-input:checked { background-color: var(--grad2); border-color: var(--grad2); }
+
+  /* ─── SCROLL ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bg2); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ LOADING SCREEN ═══════════════════════════════════ -->
+<div id="loading-screen">
+  <img src="data:image/jpeg;base64,LOGO_BASE64_PLACEHOLDER" class="loading-logo" alt="Vestigia">
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <p class="loading-tagline">Your Timeless Tracker</p>
+</div>
+
+<!-- ═══════════════════════════════════ TOAST CONTAINER ═══════════════════════════════════ -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ═══════════════════════════════════ PAGE: LOGIN ═══════════════════════════════════ -->
+<div id="page-login" class="page">
+  <div class="auth-wrap">
+    <div class="auth-left">
+      <img src="data:image/jpeg;base64,LOGO_BASE64_PLACEHOLDER" alt="Vestigia">
+      <p>Your Timeless Tracker</p>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <h2 class="auth-title">Selamat datang <span class="text-grad">kembali</span></h2>
+        <p class="auth-subtitle">Lanjutkan perjalanan harianmu</p>
+
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" id="login-email" class="form-control" placeholder="nama@email.com">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" id="login-password" class="form-control" placeholder="Minimal 6 karakter">
+        </div>
+        <div class="toggle-row mb-4">
+          <label class="toggle-label" for="remember-me">Ingat saya</label>
+          <input class="form-check-input" type="checkbox" id="remember-me">
+        </div>
+
+        <button class="btn-grad mb-3" onclick="doLogin()">Masuk</button>
+        <div class="text-center">
+          <button class="btn-ghost" onclick="showPage('page-forgot')">Lupa password?</button>
+        </div>
+
+        <div class="auth-divider">atau</div>
+        <button class="btn-outline-grad" onclick="showPage('page-register')">Buat akun baru</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE: REGISTER ═══════════════════════════════════ -->
+<div id="page-register" class="page">
+  <div class="auth-wrap">
+    <div class="auth-left">
+      <img src="data:image/jpeg;base64,LOGO_BASE64_PLACEHOLDER" alt="Vestigia">
+      <p>Your Timeless Tracker</p>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <h2 class="auth-title">Mulai perjalananmu</h2>
+        <p class="auth-subtitle">Buat akun Vestigia secara gratis</p>
+
+        <div class="mb-3">
+          <label class="form-label">Nama Lengkap</label>
+          <input type="text" id="reg-name" class="form-control" placeholder="Namamu">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" id="reg-email" class="form-control" placeholder="nama@email.com">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" id="reg-password" class="form-control" placeholder="Minimal 6 karakter">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Konfirmasi Password</label>
+          <input type="password" id="reg-confirm" class="form-control" placeholder="Ulangi password">
+        </div>
+
+        <button class="btn-grad mb-3" onclick="doRegister()">Daftar Gratis</button>
+        <div class="text-center">
+          <button class="btn-ghost" onclick="showPage('page-login')">Sudah punya akun? Masuk</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE: FORGOT PASSWORD ═══════════════════════════════════ -->
+<div id="page-forgot" class="page">
+  <div class="auth-wrap">
+    <div class="auth-left">
+      <img src="data:image/jpeg;base64,LOGO_BASE64_PLACEHOLDER" alt="Vestigia">
+      <p>Your Timeless Tracker</p>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <button class="forgot-back" onclick="showPage('page-login')"><i class="bi bi-arrow-left"></i> Kembali</button>
+        <h2 class="auth-title">Reset Password</h2>
+        <p class="auth-subtitle">Masukkan email akunmu dan kami akan membantu</p>
+
+        <div class="mb-4">
+          <label class="form-label">Email terdaftar</label>
+          <input type="email" id="forgot-email" class="form-control" placeholder="nama@email.com">
+        </div>
+        <button class="btn-grad mb-3" onclick="doForgot()">Kirim Instruksi Reset</button>
+        <p class="text-center" style="font-size:12px;color:var(--text3);">
+          Cek kotak masuk emailmu setelah mengirim
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE: APP ═══════════════════════════════════ -->
+<div id="page-app" class="page">
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <img src="data:image/jpeg;base64,LOGO_BASE64_PLACEHOLDER" alt="Vestigia">
+    <div class="nav-actions">
+      <span id="nav-plan-badge"></span>
+      <button class="btn-icon" onclick="showTab('profile')" title="Profil">
+        <i class="bi bi-person-circle"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- ── TAB: HOME ── -->
+    <div id="tab-home" class="tab-content">
+      <div class="greeting">
+        <p class="greeting-time" id="greeting-time"></p>
+        <h2 class="greeting-name" id="greeting-name">Halo!</h2>
+        <p class="greeting-quote" id="greeting-quote"></p>
+      </div>
+
+      <!-- Daily Check-in Banner -->
+      <div class="checkin-banner" id="checkin-banner">
+        <div>
+          <h3>Daily Check-in ☀️</h3>
+          <p>Bagaimana harimu dimulai?</p>
+        </div>
+        <button class="checkin-btn" onclick="openCheckin()">Mulai</button>
+      </div>
+
+      <!-- Energy Blocks -->
+      <div class="card">
+        <div class="card-title"><i class="bi bi-lightning-charge"></i> Blok Energi Hari Ini</div>
+
+        <div class="energy-block">
+          <div class="energy-header">
+            <div class="energy-label"><div class="energy-dot pagi"></div> Pagi</div>
+            <button class="btn-icon" style="width:28px;height:28px;font-size:14px" onclick="addTask('pagi')"><i class="bi bi-plus"></i></button>
+          </div>
+          <ul class="task-list" id="tasks-pagi"></ul>
+          <div class="task-add-row" id="add-pagi" style="display:none">
+            <input class="form-control" placeholder="Tugas pagi..." id="input-pagi">
+            <button class="btn-add-task" onclick="submitTask('pagi')"><i class="bi bi-check"></i></button>
+          </div>
+        </div>
+
+        <div class="energy-block">
+          <div class="energy-header">
+            <div class="energy-label"><div class="energy-dot siang"></div> Siang</div>
+            <button class="btn-icon" style="width:28px;height:28px;font-size:14px" onclick="addTask('siang')"><i class="bi bi-plus"></i></button>
+          </div>
+          <ul class="task-list" id="tasks-siang"></ul>
+          <div class="task-add-row" id="add-siang" style="display:none">
+            <input class="form-control" placeholder="Tugas siang..." id="input-siang">
+            <button class="btn-add-task" onclick="submitTask('siang')"><i class="bi bi-check"></i></button>
+          </div>
+        </div>
+
+        <div class="energy-block">
+          <div class="energy-header">
+            <div class="energy-label"><div class="energy-dot malam"></div> Malam</div>
+            <button class="btn-icon" style="width:28px;height:28px;font-size:14px" onclick="addTask('malam')"><i class="bi bi-plus"></i></button>
+          </div>
+          <ul class="task-list" id="tasks-malam"></ul>
+          <div class="task-add-row" id="add-malam" style="display:none">
+            <input class="form-control" placeholder="Tugas malam..." id="input-malam">
+            <button class="btn-add-task" onclick="submitTask('malam')"><i class="bi bi-check"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: MOOD ── -->
+    <div id="tab-mood" class="tab-content" style="display:none">
+      <h2 class="section-title">Mood Journal</h2>
+      <p class="section-sub">Catatan emosi harianmu & pola minggu ini</p>
+
+      <!-- Weekly Pattern -->
+      <div class="card">
+        <div class="card-title"><i class="bi bi-graph-up"></i> Pola Minggu Ini</div>
+        <div class="pattern-row" id="mood-pattern"></div>
+        <div id="mood-insight" style="font-size:13px;color:var(--text3);text-align:center;padding:8px 0"></div>
+      </div>
+
+      <!-- Journal Entries -->
+      <div class="card">
+        <div class="card-title"><i class="bi bi-journal-heart"></i> Catatan Emosi</div>
+        <div id="journal-list"></div>
+      </div>
+    </div>
+
+    <!-- ── TAB: KEUANGAN ── -->
+    <div id="tab-finance" class="tab-content" style="display:none">
+      <h2 class="section-title">Catat Keuangan</h2>
+      <p class="section-sub">Lacak pemasukan & pengeluaran dalam 5 detik</p>
+
+      <!-- Summary -->
+      <div class="finance-summary">
+        <div class="finance-card income">
+          <div class="finance-label">Pemasukan</div>
+          <div class="finance-amount income" id="total-income">Rp 0</div>
+        </div>
+        <div class="finance-card expense">
+          <div class="finance-label">Pengeluaran</div>
+          <div class="finance-amount expense" id="total-expense">Rp 0</div>
+        </div>
+        <div class="finance-card balance">
+          <div class="finance-label">Saldo</div>
+          <div class="finance-amount" id="total-balance">Rp 0</div>
+        </div>
+      </div>
+
+      <!-- Quick Add -->
+      <div class="card">
+        <div class="card-title"><i class="bi bi-plus-circle"></i> Tambah Cepat</div>
+        <div class="mb-3" style="display:flex;gap:8px">
+          <button class="quick-cat selected" id="type-expense" onclick="selectType('expense')">💸 Pengeluaran</button>
+          <button class="quick-cat" id="type-income" onclick="selectType('income')">💰 Pemasukan</button>
+        </div>
+        <div class="mb-3">
+          <input type="number" class="form-control" id="fin-amount" placeholder="Jumlah (Rp)">
+        </div>
+        <div class="mb-3">
+          <input type="text" class="form-control" id="fin-desc" placeholder="Keterangan (opsional)">
+        </div>
+        <div class="finance-quick" id="cat-chips"></div>
+        <button class="btn-grad" onclick="addTransaction()">Simpan</button>
+      </div>
+
+      <!-- Transaction List -->
+      <div class="card">
+        <div class="card-title"><i class="bi bi-list-check"></i> Riwayat</div>
+        <ul class="tx-list" id="tx-list"></ul>
+      </div>
+    </div>
+
+    <!-- ── TAB: REFLECTION ── -->
+    <div id="tab-reflection" class="tab-content" style="display:none">
+      <h2 class="section-title">Weekly Reflection</h2>
+      <p class="section-sub">Ringkasan minggumu dalam bentuk catatan bebas</p>
+
+      <!-- Stats -->
+      <div class="week-stats">
+        <div class="week-stat">
+          <div class="week-stat-val" id="ref-tasks-done">0</div>
+          <div class="week-stat-label">Tugas selesai</div>
+        </div>
+        <div class="week-stat">
+          <div class="week-stat-val" id="ref-mood-count">0</div>
+          <div class="week-stat-label">Hari check-in</div>
+        </div>
+        <div class="week-stat">
+          <div class="week-stat-val" id="ref-expense">0</div>
+          <div class="week-stat-label">Pengeluaran (rb)</div>
+        </div>
+        <div class="week-stat">
+          <div class="week-stat-val" id="ref-notes">0</div>
+          <div class="week-stat-label">Catatan jurnal</div>
+        </div>
+      </div>
+
+      <!-- Write Reflection -->
+      <div class="card">
+        <div class="card-title"><i class="bi bi-pencil-square"></i> Tulis Refleksimu</div>
+        <textarea class="form-control mb-3" id="reflection-input" placeholder="Minggu ini aku sudah... Aku merasa... Minggu depan aku ingin..." style="min-height:140px"></textarea>
+        <button class="btn-grad" onclick="saveReflection()">Simpan Catatan</button>
+      </div>
+
+      <!-- Past Reflections -->
+      <div id="reflection-list"></div>
+    </div>
+
+    <!-- ── TAB: PROFILE ── -->
+    <div id="tab-profile" class="tab-content" style="display:none">
+      <h2 class="section-title">Profil</h2>
+
+      <div class="card text-center">
+        <div class="profile-avatar" id="prof-avatar">V</div>
+        <h3 id="prof-name" style="font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:4px"></h3>
+        <p id="prof-email" style="font-size:13px;color:var(--text3);margin-bottom:12px"></p>
+        <span id="prof-badge"></span>
+      </div>
+
+      <!-- Edit Profile -->
+      <div class="card">
+        <div class="card-title"><i class="bi bi-person"></i> Edit Profil</div>
+        <div class="mb-3">
+          <label class="form-label">Nama</label>
+          <input type="text" class="form-control" id="edit-name">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="edit-email">
+        </div>
+        <button class="btn-grad mb-2" onclick="saveProfile()">Simpan Perubahan</button>
+      </div>
+
+      <!-- Plan -->
+      <div class="card">
+        <div class="card-title"><i class="bi bi-stars"></i> Paket Langganan</div>
+        <div class="plan-cards">
+          <div class="plan-card">
+            <div class="plan-name">Free</div>
+            <div class="plan-price">Rp 0<span>/bln</span></div>
+            <ul class="plan-feat" style="color:var(--text2)">
+              <li>Daily Check-in</li>
+              <li>Time Block (3/hari)</li>
+              <li>Mood Journal</li>
+              <li>10 transaksi/bln</li>
+              <li style="opacity:0.4">Weekly Reflection</li>
+            </ul>
+          </div>
+          <div class="plan-card pro">
+            <div class="plan-name">✨ Pro</div>
+            <div class="plan-price">Rp 29k<span>/bln</span></div>
+            <ul class="plan-feat">
+              <li>Semua fitur Free</li>
+              <li>Time Block unlimited</li>
+              <li>Mood analytics</li>
+              <li>Transaksi unlimited</li>
+              <li>Weekly Reflection</li>
+            </ul>
+          </div>
+        </div>
+        <button class="btn-grad" onclick="upgradePro()">Upgrade ke Pro ✨</button>
+      </div>
+
+      <!-- Logout -->
+      <div class="card">
+        <button class="btn-outline-grad w-100" onclick="doLogout()" style="color:#e05a6c;border-color:#e05a6c">
+          <i class="bi bi-box-arrow-right"></i> Keluar dari Akun
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="showTab('home')">
+      <i class="bi bi-house"></i><span>Beranda</span>
+    </button>
+    <button class="nav-item" id="nav-mood" onclick="showTab('mood')">
+      <i class="bi bi-heart"></i><span>Mood</span>
+    </button>
+    <button class="nav-item" id="nav-finance" onclick="showTab('finance')">
+      <i class="bi bi-wallet2"></i><span>Keuangan</span>
+    </button>
+    <button class="nav-item" id="nav-reflection" onclick="showTab('reflection')">
+      <i class="bi bi-journal-bookmark"></i><span>Refleksi</span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
+      <i class="bi bi-person"></i><span>Profil</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ═══════════════════════════════════ MODAL: CHECKIN ═══════════════════════════════════ -->
+<div class="modal-overlay" id="modal-checkin">
+  <div class="modal-box">
+    <div class="modal-title">✨ Daily Check-in</div>
+
+    <div class="mb-4">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;font-weight:500">1. Bagaimana mood-mu hari ini?</p>
+      <div class="mood-grid">
+        <div class="mood-btn" data-mood="😁" onclick="selectMood(this,'😁')"><span class="emoji">😁</span><span class="label">Luar biasa</span></div>
+        <div class="mood-btn" data-mood="😊" onclick="selectMood(this,'😊')"><span class="emoji">😊</span><span class="label">Baik</span></div>
+        <div class="mood-btn" data-mood="😐" onclick="selectMood(this,'😐')"><span class="emoji">😐</span><span class="label">Biasa</span></div>
+        <div class="mood-btn" data-mood="😔" onclick="selectMood(this,'😔')"><span class="emoji">😔</span><span class="label">Kurang</span></div>
+        <div class="mood-btn" data-mood="😫" onclick="selectMood(this,'😫')"><span class="emoji">😫</span><span class="label">Berat</span></div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label style="font-size:13px;color:var(--text2);font-weight:500;display:block;margin-bottom:8px">2. Satu prioritas utamamu hari ini?</label>
+      <input type="text" class="form-control" id="checkin-priority" placeholder="Aku akan fokus pada...">
+    </div>
+
+    <div class="mb-4">
+      <label style="font-size:13px;color:var(--text2);font-weight:500;display:block;margin-bottom:8px">3. Satu hal yang kamu syukuri?</label>
+      <input type="text" class="form-control" id="checkin-grateful" placeholder="Aku bersyukur untuk...">
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn-outline-grad" style="flex:1" onclick="closeModal('modal-checkin')">Nanti</button>
+      <button class="btn-grad" style="flex:2" onclick="submitCheckin()">Simpan ✓</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+// ═══════════════════ UTILS ═══════════════════
+const hashPass = s => btoa(encodeURIComponent(s) + '::vestigia');
+const getToday = () => new Date().toISOString().split('T')[0];
+const formatIDR = n => 'Rp ' + Math.abs(n).toLocaleString('id-ID');
+const quotes = [
+  "Setiap hari adalah kesempatan baru untuk menjadi versi terbaik dirimu.",
+  "Langkah kecil setiap hari membawa perubahan besar.",
+  "Kamu lebih kuat dari yang kamu kira.",
+  "Jangan lupa untuk menghirup udara segar hari ini.",
+  "Apresiasi dirimu untuk setiap hal kecil yang berhasil kamu lakukan.",
+];
+
+function getStore(key, def) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; }
+  catch { return def; }
+}
+function setStore(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+// ═══════════════════ TOAST ═══════════════════
+function toast(msg, type = 'info') {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = `toast-item ${type}`;
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  el.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ═══════════════════ PAGE ROUTER ═══════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ═══════════════════ AUTH ═══════════════════
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const remember = document.getElementById('remember-me').checked;
+
+  if (!email || !pass) { toast('Lengkapi email dan password', 'error'); return; }
+  if (!/\S+@\S+\.\S+/.test(email)) { toast('Format email tidak valid', 'error'); return; }
+
+  const users = getStore('vg_users', []);
+  const user = users.find(u => u.email === email && u.password === hashPass(pass));
+  if (!user) { toast('Email atau password salah', 'error'); return; }
+
+  const session = { uid: user.uid, email: user.email, remember };
+  setStore('vg_session', session);
+
+  toast(`Selamat datang, ${user.name}! 👋`, 'success');
+  enterApp(user);
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-confirm').value;
+
+  if (!name || !email || !pass || !confirm) { toast('Semua field harus diisi', 'error'); return; }
+  if (!/\S+@\S+\.\S+/.test(email)) { toast('Format email tidak valid', 'error'); return; }
+  if (pass.length < 6) { toast('Password minimal 6 karakter', 'error'); return; }
+  if (pass !== confirm) { toast('Password tidak cocok', 'error'); return; }
+
+  const users = getStore('vg_users', []);
+  if (users.find(u => u.email === email)) { toast('Email sudah terdaftar', 'error'); return; }
+
+  const uid = 'uid_' + Date.now();
+  const newUser = { uid, name, email, password: hashPass(pass), plan: 'free', joined: getToday() };
+  users.push(newUser);
+  setStore('vg_users', users);
+
+  const session = { uid, email, remember: false };
+  setStore('vg_session', session);
+
+  toast(`Akun berhasil dibuat! Selamat datang, ${name} 🎉`, 'success');
+  enterApp(newUser);
+}
+
+function doForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { toast('Masukkan email yang valid', 'error'); return; }
+
+  const users = getStore('vg_users', []);
+  const user = users.find(u => u.email === email);
+  if (!user) { toast('Email tidak ditemukan', 'error'); return; }
+
+  toast('Instruksi reset telah "dikirim" ke emailmu ✉️', 'success');
+  setTimeout(() => showPage('page-login'), 1500);
+}
+
+function doLogout() {
+  localStorage.removeItem('vg_session');
+  toast('Kamu telah keluar dari akun');
+  showPage('page-login');
+}
+
+function getCurrentUser() {
+  const session = getStore('vg_session', null);
+  if (!session) return null;
+  const users = getStore('vg_users', []);
+  return users.find(u => u.uid === session.uid) || null;
+}
+
+// ═══════════════════ ENTER APP ═══════════════════
+function enterApp(user) {
+  showPage('page-app');
+  renderApp(user);
+  showTab('home');
+}
+
+function renderApp(user) {
+  if (!user) return;
+
+  // Greeting
+  const hour = new Date().getHours();
+  const sapa = hour < 11 ? 'Selamat Pagi' : hour < 15 ? 'Selamat Siang' : hour < 18 ? 'Selamat Sore' : 'Selamat Malam';
+  document.getElementById('greeting-time').textContent = sapa;
+  document.getElementById('greeting-name').textContent = user.name + ' ✨';
+  document.getElementById('greeting-quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+
+  // Badge
+  const badge = document.getElementById('nav-plan-badge');
+  badge.innerHTML = user.plan === 'pro'
+    ? '<span class="badge-pro">⭐ PRO</span>'
+    : '<span class="badge-free">FREE</span>';
+
+  // Profile tab
+  document.getElementById('prof-avatar').textContent = user.name[0].toUpperCase();
+  document.getElementById('prof-name').textContent = user.name;
+  document.getElementById('prof-email').textContent = user.email;
+  document.getElementById('prof-badge').innerHTML = user.plan === 'pro'
+    ? '<span class="badge-pro">⭐ PRO Member</span>'
+    : '<span class="badge-free">FREE Member</span>';
+  document.getElementById('edit-name').value = user.name;
+  document.getElementById('edit-email').value = user.email;
+
+  // Checkin banner
+  const todayData = getStore('vg_checkin_' + getToday() + '_' + user.uid, null);
+  if (todayData) {
+    document.getElementById('checkin-banner').innerHTML = `
+      <div>
+        <h3>Check-in selesai ${todayData.mood}</h3>
+        <p>Prioritasmu: ${todayData.priority}</p>
+      </div>
+      <span class="pill">✓ Done</span>
+    `;
+  }
+
+  renderTasks(user);
+  renderMoodTab(user);
+  renderFinanceTab(user);
+  renderReflectionTab(user);
+}
+
+// ═══════════════════ TAB SWITCHING ═══════════════════
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+
+  const user = getCurrentUser();
+  if (user) renderApp(user);
+}
+
+// ═══════════════════ MODALS ═══════════════════
+function openCheckin() { document.getElementById('modal-checkin').classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+let selectedMoodEmoji = '';
+function selectMood(el, emoji) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMoodEmoji = emoji;
+}
+
+function submitCheckin() {
+  const user = getCurrentUser();
+  if (!selectedMoodEmoji) { toast('Pilih mood dulu ya 😊', 'error'); return; }
+  const priority = document.getElementById('checkin-priority').value.trim();
+  const grateful = document.getElementById('checkin-grateful').value.trim();
+  if (!priority || !grateful) { toast('Isi prioritas dan rasa syukurmu', 'error'); return; }
+
+  const data = { mood: selectedMoodEmoji, priority, grateful, date: getToday(), ts: Date.now() };
+  setStore('vg_checkin_' + getToday() + '_' + user.uid, data);
+
+  // Also store in journal
+  const journal = getStore('vg_journal_' + user.uid, []);
+  journal.unshift({ ...data, note: `Prioritas: ${priority}. Bersyukur: ${grateful}` });
+  setStore('vg_journal_' + user.uid, journal);
+
+  closeModal('modal-checkin');
+  toast('Check-in tersimpan! Semangat hari ini 🌟', 'success');
+  renderApp(user);
+}
+
+// ═══════════════════ TASKS / ENERGY BLOCKS ═══════════════════
+function renderTasks(user) {
+  ['pagi','siang','malam'].forEach(sesi => {
+    const tasks = getStore('vg_tasks_' + getToday() + '_' + sesi + '_' + user.uid, []);
+    const list = document.getElementById('tasks-' + sesi);
+    list.innerHTML = tasks.length === 0
+      ? '<li style="font-size:12px;color:var(--text3);padding:4px 0;text-align:center">Belum ada tugas</li>'
+      : tasks.map((t,i) => `
+          <li class="task-item">
+            <div class="task-check ${t.done?'done':''}" onclick="toggleTask('${sesi}',${i})">
+              ${t.done ? '<i class="bi bi-check" style="font-size:10px"></i>' : ''}
+            </div>
+            <span class="task-text ${t.done?'done':''}">${t.text}</span>
+            <button class="btn-icon" style="width:24px;height:24px;font-size:12px;margin-left:auto" onclick="deleteTask('${sesi}',${i})">
+              <i class="bi bi-x"></i>
+            </button>
+          </li>
+        `).join('');
+  });
+}
+
+function addTask(sesi) {
+  const row = document.getElementById('add-' + sesi);
+  row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+  if (row.style.display === 'flex') document.getElementById('input-' + sesi).focus();
+}
+
+function submitTask(sesi) {
+  const user = getCurrentUser();
+  const input = document.getElementById('input-' + sesi);
+  const text = input.value.trim();
+  if (!text) return;
+  const key = 'vg_tasks_' + getToday() + '_' + sesi + '_' + user.uid;
+  const tasks = getStore(key, []);
+
+  const user2 = getCurrentUser();
+  if (user2.plan === 'free' && tasks.length >= 3) {
+    toast('Paket Free max 3 tugas/sesi. Upgrade ke Pro untuk unlimited! ✨', 'error');
+    return;
+  }
+
+  tasks.push({ text, done: false });
+  setStore(key, tasks);
+  input.value = '';
+  document.getElementById('add-' + sesi).style.display = 'none';
+  renderTasks(user);
+}
+
+function toggleTask(sesi, idx) {
+  const user = getCurrentUser();
+  const key = 'vg_tasks_' + getToday() + '_' + sesi + '_' + user.uid;
+  const tasks = getStore(key, []);
+  tasks[idx].done = !tasks[idx].done;
+  setStore(key, tasks);
+  renderTasks(user);
+}
+
+function deleteTask(sesi, idx) {
+  const user = getCurrentUser();
+  const key = 'vg_tasks_' + getToday() + '_' + sesi + '_' + user.uid;
+  const tasks = getStore(key, []);
+  tasks.splice(idx, 1);
+  setStore(key, tasks);
+  renderTasks(user);
+}
+
+// ═══════════════════ MOOD TAB ═══════════════════
+function renderMoodTab(user) {
+  const journal = getStore('vg_journal_' + user.uid, []);
+
+  // Weekly pattern (last 7 days)
+  const days = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+  const today = new Date();
+  const pattern = document.getElementById('mood-pattern');
+  let patternHTML = '';
+  const moodCounts = {};
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const entry = getStore('vg_checkin_' + dateStr + '_' + user.uid, null);
+    const dayName = days[d.getDay() === 0 ? 6 : d.getDay() - 1];
+    const hasMood = !!entry;
+    if (entry) {
+      moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
+    }
+    patternHTML += `
+      <div class="pattern-day ${hasMood?'has-mood':''}">
+        <div class="pattern-day-name">${dayName}</div>
+        <span class="pattern-day-emoji">${hasMood ? entry.mood : '○'}</span>
+      </div>
+    `;
+  }
+  pattern.innerHTML = patternHTML;
+
+  // Insight
+  const topMood = Object.entries(moodCounts).sort((a,b) => b[1]-a[1])[0];
+  const insight = document.getElementById('mood-insight');
+  if (topMood) {
+    insight.textContent = `Mood dominan minggu ini: ${topMood[0]} (${topMood[1]}x)`;
+  } else {
+    insight.textContent = 'Mulai check-in harian untuk melihat polamu';
+  }
+
+  // Journal list
+  const list = document.getElementById('journal-list');
+  if (journal.length === 0) {
+    list.innerHTML = `<div class="empty-state"><i class="bi bi-journal"></i><p>Belum ada catatan.<br>Lakukan Daily Check-in untuk memulai.</p></div>`;
+  } else {
+    list.innerHTML = journal.slice(0,10).map(j => `
+      <div class="journal-entry">
+        <div class="journal-meta">
+          <span class="journal-date">${j.date}</span>
+          <span class="journal-mood">${j.mood}</span>
+        </div>
+        <p class="journal-text">${j.note}</p>
+      </div>
+    `).join('');
+  }
+}
+
+// ═══════════════════ FINANCE TAB ═══════════════════
+let selectedType = 'expense';
+const cats = {
+  expense: ['🍜 Makan','🚌 Transport','📚 Buku','🎮 Hiburan','💊 Kesehatan','🛒 Belanja','📱 Pulsa','🏠 Kos'],
+  income: ['💼 Beasiswa','👨‍💻 Freelance','💝 Kiriman','🎁 Hadiah','📱 Jualan']
+};
+
+function selectType(type) {
+  selectedType = type;
+  document.getElementById('type-expense').classList.toggle('selected', type === 'expense');
+  document.getElementById('type-income').classList.toggle('selected', type === 'income');
+  renderCatChips();
+}
+
+let selectedCat = '';
+function renderCatChips() {
+  selectedCat = '';
+  const chips = document.getElementById('cat-chips');
+  chips.innerHTML = cats[selectedType].map(c => `
+    <button class="quick-cat" onclick="selectCat(this,'${c}')">${c}</button>
+  `).join('');
+}
+
+function selectCat(el, cat) {
+  document.querySelectorAll('#cat-chips .quick-cat').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = cat;
+}
+
+function renderFinanceTab(user) {
+  renderCatChips();
+  const txs = getStore('vg_tx_' + user.uid, []);
+  let income = 0, expense = 0;
+  txs.forEach(t => {
+    if (t.type === 'income') income += t.amount;
+    else expense += t.amount;
+  });
+  document.getElementById('total-income').textContent = formatIDR(income);
+  document.getElementById('total-expense').textContent = formatIDR(expense);
+  const bal = income - expense;
+  const balEl = document.getElementById('total-balance');
+  balEl.textContent = formatIDR(bal);
+  balEl.style.color = bal >= 0 ? '#4caf82' : '#e05a6c';
+
+  const list = document.getElementById('tx-list');
+  if (txs.length === 0) {
+    list.innerHTML = '<li class="empty-state"><i class="bi bi-wallet2"></i><p>Belum ada transaksi</p></li>';
+    return;
+  }
+  list.innerHTML = txs.slice(0,20).map((t,i) => `
+    <li class="tx-item">
+      <div class="tx-left">
+        <div class="tx-icon ${t.type}">${t.type === 'income' ? '💰' : '💸'}</div>
+        <div>
+          <div class="tx-name">${t.desc || t.cat || 'Transaksi'}</div>
+          <div class="tx-cat">${t.cat} · ${t.date}</div>
+        </div>
+      </div>
+      <div>
+        <div class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${formatIDR(t.amount)}</div>
+      </div>
+    </li>
+  `).join('');
+}
+
+function addTransaction() {
+  const user = getCurrentUser();
+  const amount = parseFloat(document.getElementById('fin-amount').value);
+  const desc = document.getElementById('fin-desc').value.trim();
+
+  if (!amount || amount <= 0) { toast('Masukkan jumlah yang valid', 'error'); return; }
+
+  const txs = getStore('vg_tx_' + user.uid, []);
+  if (user.plan === 'free' && txs.filter(t => t.date.startsWith(new Date().toISOString().slice(0,7))).length >= 10) {
+    toast('Paket Free max 10 transaksi/bulan. Upgrade ke Pro! ✨', 'error');
+    return;
+  }
+
+  txs.unshift({ type: selectedType, amount, cat: selectedCat || 'Lainnya', desc, date: getToday(), ts: Date.now() });
+  setStore('vg_tx_' + user.uid, txs);
+
+  document.getElementById('fin-amount').value = '';
+  document.getElementById('fin-desc').value = '';
+  renderFinanceTab(user);
+  toast('Transaksi tersimpan ✓', 'success');
+}
+
+// ═══════════════════ REFLECTION TAB ═══════════════════
+function renderReflectionTab(user) {
+  // Stats
+  let tasksDone = 0;
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    ['pagi','siang','malam'].forEach(s => {
+      const tasks = getStore('vg_tasks_' + ds + '_' + s + '_' + user.uid, []);
+      tasksDone += tasks.filter(t => t.done).length;
+    });
+  }
+
+  let moodCount = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    if (getStore('vg_checkin_' + ds + '_' + user.uid, null)) moodCount++;
+  }
+
+  const txs = getStore('vg_tx_' + user.uid, []);
+  const weekExpense = txs.filter(t => {
+    const d = new Date(t.date);
+    const diff = Math.abs(today - d) / 86400000;
+    return diff <= 7 && t.type === 'expense';
+  }).reduce((s,t) => s + t.amount, 0);
+
+  const journal = getStore('vg_journal_' + user.uid, []);
+
+  document.getElementById('ref-tasks-done').textContent = tasksDone;
+  document.getElementById('ref-mood-count').textContent = moodCount;
+  document.getElementById('ref-expense').textContent = Math.round(weekExpense / 1000);
+  document.getElementById('ref-notes').textContent = journal.length;
+
+  // Reflection list
+  const refs = getStore('vg_reflections_' + user.uid, []);
+  const list = document.getElementById('reflection-list');
+
+  if (refs.length === 0) {
+    list.innerHTML = `<div class="empty-state"><i class="bi bi-journal-bookmark"></i><p>Belum ada refleksi.<br>Mulai tulis catatan mingguanmu.</p></div>`;
+    return;
+  }
+
+  list.innerHTML = refs.map(r => `
+    <div class="card">
+      <div class="reflection-note">
+        <div class="reflection-meta">📅 ${r.date}</div>
+        <p class="reflection-text">${r.text.replace(/\n/g,'<br>')}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveReflection() {
+  const user = getCurrentUser();
+  const text = document.getElementById('reflection-input').value.trim();
+  if (!text) { toast('Tulis refleksimu terlebih dahulu', 'error'); return; }
+
+  const refs = getStore('vg_reflections_' + user.uid, []);
+  refs.unshift({ text, date: getToday(), ts: Date.now() });
+  setStore('vg_reflections_' + user.uid, refs);
+
+  document.getElementById('reflection-input').value = '';
+  renderReflectionTab(user);
+  toast('Refleksi tersimpan 📝', 'success');
+}
+
+// ═══════════════════ PROFILE ═══════════════════
+function saveProfile() {
+  const user = getCurrentUser();
+  const name = document.getElementById('edit-name').value.trim();
+  const email = document.getElementById('edit-email').value.trim();
+
+  if (!name || !email) { toast('Nama dan email tidak boleh kosong', 'error'); return; }
+  if (!/\S+@\S+\.\S+/.test(email)) { toast('Format email tidak valid', 'error'); return; }
+
+  const users = getStore('vg_users', []);
+  const idx = users.findIndex(u => u.uid === user.uid);
+  users[idx].name = name;
+  users[idx].email = email;
+  setStore('vg_users', users);
+
+  const session = getStore('vg_session', null);
+  session.email = email;
+  setStore('vg_session', session);
+
+  toast('Profil berhasil diperbarui ✓', 'success');
+  renderApp(users[idx]);
+}
+
+function upgradePro() {
+  const user = getCurrentUser();
+  const users = getStore('vg_users', []);
+  const idx = users.findIndex(u => u.uid === user.uid);
+
+  if (users[idx].plan === 'pro') {
+    toast('Kamu sudah berlangganan Pro! 🌟', 'success');
+    return;
+  }
+
+  users[idx].plan = 'pro';
+  setStore('vg_users', users);
+  toast('Selamat! Kamu sekarang Pro Member ✨', 'success');
+  renderApp(users[idx]);
+}
+
+// ═══════════════════ KEYBOARD SHORTCUTS ═══════════════════
+['input-pagi','input-siang','input-malam'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitTask(id.replace('input-', ''));
+  });
+});
+
+// ═══════════════════ INIT ═══════════════════
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loading-screen').classList.add('hide');
+    const session = getStore('vg_session', null);
+    if (session) {
+      const user = getCurrentUser();
+      if (user) { enterApp(user); return; }
+    }
+    showPage('page-login');
+  }, 2200);
+});
+
+// ═══════════════════ SERVICE WORKER ═══════════════════
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'vestigia-v1';
+    const URLS = [location.href];
+    self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(URLS))));
+    self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl);
+}
+
+// ═══════════════════ MANIFEST ═══════════════════
+const manifest = {
+  name: 'Vestigia',
+  short_name: 'Vestigia',
+  description: 'Your Timeless Tracker',
+  start_url: '/',
+  display: 'standalone',
+  background_color: '#f7f5f0',
+  theme_color: '#28279f',
+  icons: [{ src: 'data:image/png;base64,iVBORw0KGgo=', sizes: '192x192', type: 'image/png' }]
+};
+const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+document.getElementById('manifest-link').href = URL.createObjectURL(mBlob);
+document.getElementById('manifest-link').rel = 'manifest';
+
+</script>
+</body>
+</html>
